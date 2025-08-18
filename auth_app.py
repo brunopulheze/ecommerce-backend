@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, APIRouter
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from pymongo import MongoClient
@@ -28,15 +28,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # FastAPI app
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # frontend origin
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+router = APIRouter()
 
 class User(BaseModel):
     name: str
@@ -73,7 +65,7 @@ def verify_password(plain_password, hashed_password):
 def hash_password(password):
     return pwd_context.hash(password)
 
-@app.post("/register", response_model=UserOut)
+@router.post("/register", response_model=UserOut)
 def register(user: User):
     if get_user_by_email(user.email):
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -88,18 +80,27 @@ def register(user: User):
         address=user.address
     )
 
-@app.post("/login", response_model=Token)
+@router.post("/login", response_model=Token)
 def login(user: UserLogin):
     db_user = get_user_by_email(user.email)
     if not db_user or not verify_password(user.password, db_user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token_data = {"sub": str(db_user["_id"]), "email": db_user["email"]}
     access_token = create_access_token(token_data)
-    return {"access_token": access_token, "token_type": "bearer"}
+    # Return user info as well for frontend convenience
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": {
+            "name": db_user["name"],
+            "email": db_user["email"],
+            "address": db_user.get("address", "")
+        }
+    }
 
 # Dependency to get current user
 from fastapi.security import OAuth2PasswordBearer
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -123,6 +124,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         address=user["address"]
     )
 
-@app.get("/me", response_model=UserOut)
+@router.get("/me", response_model=UserOut)
 def read_users_me(current_user: UserOut = Depends(get_current_user)):
     return current_user
