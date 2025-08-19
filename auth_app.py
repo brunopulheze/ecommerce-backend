@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()  # Loads variables from .env into environment
 
-# MongoDB setup (adjust connection string as needed)
+# MongoDB setup
 MONGODB_URI = os.getenv("MONGODB_URI")
 DB_NAME = os.getenv("DB_NAME")
 client = MongoClient(MONGODB_URI)

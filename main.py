@@ -6,7 +6,7 @@ from cart_app import router as cart_router
 app = FastAPI()
 
 origins = [
-    "https://brunopulheze.github.io",  # your deployed frontend
+    "https://brunopulheze.github.io",  # deployed frontend
     "http://localhost:3000"              # local development (React default)
 ]
 
@@ -18,6 +18,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def read_root():
+    return {"message": "Backend is running!"}
 
 # Register routers
 app.include_router(auth_router)
