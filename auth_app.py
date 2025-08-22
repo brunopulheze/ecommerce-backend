@@ -34,13 +34,11 @@ class User(BaseModel):
     name: str
     email: EmailStr
     password: str
-    address: str
 
 class UserOut(BaseModel):
     id: str
     name: str
     email: EmailStr
-    address: str
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -77,7 +75,6 @@ def register(user: User):
         id=str(result.inserted_id),
         name=user.name,
         email=user.email,
-        address=user.address
     )
 
 @router.post("/login", response_model=Token)
@@ -94,7 +91,6 @@ def login(user: UserLogin):
         "user": {
             "name": db_user["name"],
             "email": db_user["email"],
-            "address": db_user.get("address", "")
         }
     }
 
@@ -121,7 +117,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         id=str(user["_id"]),
         name=user["name"],
         email=user["email"],
-        address=user["address"]
     )
 
 @router.get("/me", response_model=UserOut)

@@ -6,11 +6,10 @@ from cart_app import router as cart_router
 app = FastAPI()
 
 origins = [
-    "https://brunopulheze.github.io",  # deployed frontend
-    "http://localhost:3000"              # local development (React default)
+    "https://brunopulheze.github.io",
+    "http://localhost:3000"
 ]
 
-# Add CORS middleware to the main app
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -23,6 +22,5 @@ app.add_middleware(
 def read_root():
     return {"message": "Backend is running!"}
 
-# Register routers
 app.include_router(auth_router)
 app.include_router(cart_router)
