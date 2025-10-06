@@ -23,6 +23,10 @@ app.add_middleware(
 def read_root():
     return {"message": "Backend is running!"}
 
+@app.head("/")
+def root_head():
+    return
+
 app.include_router(auth_router)
 app.include_router(cart_router)
 app.include_router(survey_router)   # add here
