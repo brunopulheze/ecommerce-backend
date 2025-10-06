@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from auth_app import router as auth_router
 from cart_app import router as cart_router
+from survey_app import router as survey_router   # import here
 
 app = FastAPI()
 
@@ -24,3 +25,4 @@ def read_root():
 
 app.include_router(auth_router)
 app.include_router(cart_router)
+app.include_router(survey_router)   # add here
