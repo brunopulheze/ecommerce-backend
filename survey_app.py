@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from pymongo import MongoClient
-from bson import ObjectId
 from datetime import datetime
 import os
 from dotenv import load_dotenv
@@ -17,11 +16,11 @@ surveys_collection = db["surveys"]
 router = APIRouter()
 
 class SurveySubmission(BaseModel):
-    preferredAuthBar: str
-    preferredCartIcon: str
-    preferredDrawerSide: str
-    preferredButtonColor: str
-    preferredFooterBg: str
+    preferredLayout: str  # "A" or "B"
+    shoppingFrequency: str
+    favoriteDevice: str
+    influencingFactors: List[str]
+    satisfactionLevel: str
     comments: Optional[str] = ""
 
 @router.post("/survey")
